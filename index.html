@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTU - Online Testing University</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;600;800&family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                        abhaya: ['"Abhaya Libre"', 'serif'],
+                    },
+                    colors: {
+                        neonPurple: '#b026ff',
+                        neonBlue: '#26c6ff',
+                        neonGreen: '#39ff14', /* Neon Green */
+                        deepBg: '#0f0c29',
+                        lightBg: '#f0f4f8',
+                        navDark: '#1f2024', /* Lighter Solid Grey for Nav (Gray-600) */
+                        navLight: '#ffffff',
+                    },
+                    fontSize: {
+                        'responsive-h1': 'clamp(2.5rem, 5vw, 6rem)',
+                        'responsive-p': 'clamp(1rem, 1.5vw, 1.5rem)',
+                    },
+                    animation: {
+                        'spin-linear': 'spin 1.5s linear infinite',
+                        'spin-disk': 'spin 4s linear infinite',
+                        'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+                    },
+                    keyframes: {
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Kanit', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Animated Background (Dark Mode) */
+        .dark .bg-animated {
+            background: linear-gradient(-45deg, #301046, #090979, #2b0336, #00d4ff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        /* Background (Light Mode) */
+        .bg-animated {
+            background: #f0f4f8; 
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Navbar Custom Styles */
+        .nav-custom {
+            border-bottom: 1px solid rgba(202, 202, 202, 0.2);
+        }
+        html:not(.dark) .nav-custom {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Glassmorphism for panels (Keep for modal/menus, removed from Nav) */
+        .glass-panel {
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+        }
+        html:not(.dark) .glass-panel {
+             background: rgba(255, 255, 255, 0.95);
+             border: 1px solid rgba(0, 0, 0, 0.1);
+             color: #000;
+        }
+
+        /* Loading Screen */
+        #preloader { transition: opacity 0.8s ease-out, visibility 0.8s; }
+        #main-content { filter: blur(10px); transition: filter 1s ease-out; }
+        .loader-ring {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: #b026ff; border-right-color: #26c6ff; border-bottom-color: #ff265c;
+            animation: spin-linear 1s linear infinite; 
+        }
+        @keyframes spin-linear { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Ayanokoji Image */
+        #ayanokoji-img { transition: filter 0.1s ease, transform 0.1s ease; will-change: transform, filter; }
+
+        /* Disc Animation */
+        .disc-wrapper { transition: transform 0.3s ease; }
+        .disc-img { animation: spin-disk 4s linear infinite; animation-play-state: paused; transition: filter 0.3s ease; }
+        .disc-wrapper:hover { transform: scale(1.1); }
+        .disc-wrapper:hover .disc-img { filter: grayscale(100%); animation-play-state: paused !important; }
+
+        /* Checkmark (Larger & Neon Green & No Donut Hole) */
+        .checkmark__circle { 
+            stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; 
+            stroke: #39ff14; /* Neon Green */
+            fill: none; 
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; 
+        }
+        .checkmark { 
+            width: 80px; /* Larger */
+            height: 80px; 
+            border-radius: 50%; display: block; stroke-width: 2; 
+            stroke: #39ff14; /* Neon Green */
+            stroke-miterlimit: 10; margin: 10% auto; 
+            box-shadow: inset 0px 0px 0px #39ff14; 
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both; 
+        }
+        .checkmark__check { 
+            transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; 
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; 
+            stroke: #fff; /* Checkmark itself remains white */
+        }
+        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+        @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+        /* Adjusted filling to cover the hole (from 30px to 50px+) */
+        @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 50px #39ff14; } }
+
+        /* Fixed Header Spacing */
+        .header-spacer { height: 140px; } 
+    </style>
+</head>
+<body class="text-gray-900 dark:text-white min-h-screen relative overflow-x-hidden bg-animated">
+
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 z-[100] bg-deepBg flex items-center justify-center backdrop-blur-xl">
+        <div class="loader-ring"></div>
+    </div>
+
+    <!-- Particle Background -->
+    <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="relative z-10 w-full min-h-screen flex flex-col justify-between">
+
+        <!-- Fixed Header Group (Nav + Marquee) -->
+        <header class="fixed top-0 left-0 w-full z-50 flex flex-col shadow-2xl">
+            
+            <!-- Navbar (Solid Lighter Grey in Dark Mode, No Blur) -->
+            <nav class="w-full bg-navLight dark:bg-navDark nav-custom px-6 py-2 flex justify-between items-center transition-colors duration-300 z-50 h-20">
+                <!-- Left: Logo -->
+                <div class="flex items-center">
+                    <img src="web_icon.png" alt="Logo" class="h-24 md:h-32 w-auto object-contain hover:scale-105 transition duration-300 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-2">
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex items-center space-x-6">
+                    
+                    <!-- Auth Section -->
+                    <div id="auth-section" class="flex items-center">
+                        <button onclick="openModal()" id="btn-login" class="px-6 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-blue-600 transition-all duration-300 shadow-lg font-bold text-lg flex items-center gap-2 text-white border border-white/20">
+                            <i class="fas fa-sign-in-alt"></i> <span id="nav-login-text">ลงชื่อเข้าใช้</span>
+                        </button>
+                        
+                        <!-- User Profile Display (Stretched Left with pl-8) -->
+                        <div id="user-profile" class="hidden items-center gap-4 glass-panel pl-8 pr-4 py-1.5 rounded-full border border-purple-500/50 min-w-[200px] justify-between">
+                            <div class="flex items-center gap-3">
+                                <img id="user-school-logo" src="" class="w-10 h-10 rounded-full border-2 border-white/50 bg-white object-contain">
+                                <div class="flex flex-col">
+                                    <span id="user-name-display" class="font-kanit text-base font-bold dark:text-white text-black">User</span>
+                                    <span class="text-[10px] text-green-500 font-bold uppercase tracking-wider">Online</span>
+                                </div>
+                            </div>
+                            <div class="h-6 w-px bg-gray-500/50 mx-2"></div>
+                            <button onclick="openLogoutModal()" class="group flex items-center gap-2 text-red-500 hover:text-red-600 transition-all">
+                                <i class="fas fa-power-off text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Settings Menu -->
+                    <div class="relative">
+                        <button onclick="toggleMenu()" class="w-10 h-10 rounded-full border border-gray-400/30 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/10 transition text-current">
+                            <i class="fas fa-ellipsis-v text-lg"></i>
+                        </button>
+                        
+                        <!-- Dropdown -->
+                        <div id="settings-menu" class="absolute right-0 top-14 w-52 glass-panel rounded-xl p-2 hidden transform origin-top-right transition-all duration-200 scale-95 opacity-0 text-white shadow-2xl">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex justify-between items-center p-3 rounded-lg hover:bg-white/10 cursor-pointer text-gray-800 dark:text-white" onclick="toggleTheme()">
+                                    <span class="text-base font-kanit"><i class="fas fa-adjust mr-2"></i>Theme</span>
+                                    <i id="theme-icon" class="fas fa-moon text-yellow-400"></i>
+                                </div>
+                                <div class="flex justify-between items-center p-3 rounded-lg hover:bg-white/10 cursor-pointer text-gray-800 dark:text-white" onclick="toggleLang()">
+                                    <span class="text-base font-kanit"><i class="fas fa-language mr-2"></i>Language</span>
+                                    <span id="current-lang" class="text-xs border border-neonBlue px-2 py-1 rounded text-neonBlue">TH</span>
+                                </div>
+                                <!-- Reset Cookies Option -->
+                                <div class="flex justify-between items-center p-3 rounded-lg hover:bg-white/10 cursor-pointer text-gray-800 dark:text-white" onclick="resetCookies()">
+                                    <span class="text-base font-kanit"><i class="fas fa-cookie mr-2"></i>Reset Cookies</span>
+                                    <i class="fas fa-redo text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Marquee (Slimmer height) -->
+            <div class="w-full bg-gradient-to-r from-blue-800 to-blue-600 h-8 flex items-center border-b border-white/20 shadow-lg overflow-hidden">
+                <marquee scrollamount="10" class="text-base font-bold text-white font-abhaya tracking-widest leading-none mt-1">
+                    ONLINE TESTING UNIVERSITY &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ONLINE TESTING UNIVERSITY &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; ONLINE TESTING UNIVERSITY
+                </marquee>
+            </div>
+
+        </header>
+
+        <!-- Spacer -->
+        <div class="header-spacer"></div>
+
+        <!-- Hero Section -->
+        <main class="flex-grow flex flex-col md:flex-row items-center justify-center relative w-full max-w-[1920px] mx-auto mt-6">
+            
+            <!-- Left Text Content -->
+            <div class="w-full md:w-1/2 z-20 text-center md:text-left space-y-8 pl-6 md:pl-28 pr-6">
+                <h1 class="font-bold leading-tight text-responsive-h1">
+                    <span id="hero-welcome" class="block mb-2 dark:text-white text-gray-800">ยินดีต้อนรับสู่</span>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-neonBlue via-purple-500 to-neonPurple drop-shadow-[0_0_15px_rgba(176,38,255,0.4)]">
+                        OTU.AC.TH!
+                    </span>
+                </h1>
+                
+                <p id="hero-desc" class="text-responsive-p font-light tracking-wide max-w-2xl mx-auto md:mx-0 border-l-4 border-neonPurple pl-6 bg-gradient-to-r from-purple-900/20 to-transparent py-4 rounded-r-lg dark:text-gray-300 text-gray-700">
+                    ถ้าคุณอยากเป็นคนที่ฉลาดสอบติดทุกโรงเรียนโปรดสมัครเลย
+                </p>
+
+                <div class="pt-6">
+                    <button onclick="openModal()" id="hero-action-btn" class="group relative px-10 py-4 rounded-full bg-transparent overflow-hidden border-2 border-neonPurple dark:text-white text-purple-700 shadow-[0_0_20px_rgba(176,38,255,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(176,38,255,0.6)]">
+                        <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-neonPurple to-blue-600 opacity-20 group-hover:opacity-40 transition-opacity"></span>
+                        <span class="relative font-bold text-xl flex items-center gap-3">
+                            <span id="hero-btn-text">ลงชื่อสมัคร</span> 
+                            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Image -->
+            <div class="w-full md:w-1/2 h-[50vh] md:h-[80vh] relative flex justify-end items-end mt-10 md:mt-0 pointer-events-none">
+                <!-- Glowing Circle Background -->
+                <div class="absolute bottom-0 right-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-purple-600 rounded-full filter blur-[100px] opacity-30 animate-pulse"></div>
+                
+                <!-- Character Image -->
+                <img id="ayanokoji-img" 
+                     src="anime.jpg" 
+                     alt="Character" 
+                     class="relative h-full w-auto object-contain object-right-bottom z-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Music Player Widget -->
+    <div class="fixed bottom-24 right-8 z-40 flex flex-col items-center group">
+        <!-- Info Text -->
+        <div id="music-info" class="mb-3 text-right opacity-0 transition-opacity duration-500 bg-black/70 p-3 rounded-xl backdrop-blur-md border border-white/10">
+            <p id="song-title" class="text-sm font-bold text-neonBlue whitespace-nowrap">Classroom of the Elite OST</p>
+            <p id="song-artist" class="text-xs text-gray-300 whitespace-nowrap">Now Playing</p>
+        </div>
+
+        <!-- Disc Image -->
+        <div class="disc-wrapper cursor-pointer w-28 h-28 relative" onclick="togglePlay()">
+             <div class="absolute top-1/2 left-1/2 w-4 h-4 bg-black rounded-full transform -translate-x-1/2 -translate-y-1/2 z-20 border border-gray-700"></div>
+             <img src="disc.png" alt="Music Disc" class="disc-img w-full h-full object-cover rounded-full shadow-[0_0_20px_rgba(0,0,0,0.6)] border-4 border-gray-800">
+             <!-- Status Icon -->
+             <div id="play-status" class="absolute inset-0 flex items-center justify-center z-30 opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 rounded-full">
+                 <i id="play-icon" class="fas fa-play text-white text-3xl drop-shadow-md"></i>
+             </div>
+        </div>
+    </div>
+    
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" class="fixed bottom-0 left-0 w-full z-50 glass-panel border-t border-purple-500/30 p-4 md:px-10 flex flex-col md:flex-row justify-between items-center gap-4 transform translate-y-full transition-transform duration-500">
+        <div class="flex items-center gap-4 dark:text-white text-black">
+            <i class="fas fa-cookie-bite text-3xl text-yellow-400"></i>
+            <div>
+                <p class="font-bold text-sm md:text-base">เว็บไซต์นี้ใช้คุกกี้ (Cookies)</p>
+                <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400">เพื่อประสบการณ์การใช้งานที่ดีที่สุดของคุณ</p>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="acceptCookies()" class="px-6 py-2 rounded-lg bg-neonPurple hover:bg-purple-600 text-white font-bold text-sm transition shadow-[0_0_10px_#b026ff]">
+                ยอมรับ (Accept)
+            </button>
+            <button onclick="acceptCookies()" class="px-6 py-2 rounded-lg border border-gray-400 dark:border-white/20 hover:bg-gray-200 dark:hover:bg-white/10 dark:text-white text-black font-medium text-sm transition">
+                ปฏิเสธ (Decline)
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden Youtube Player -->
+    <div id="youtube-player" class="hidden"></div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeLogoutModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 glass-panel p-8 rounded-2xl shadow-2xl text-center border border-purple-500/30 w-[90%] max-w-sm">
+            <h3 class="text-2xl font-bold mb-6 text-white">ยืนยันการออกจากระบบ?</h3>
+            <div class="flex gap-4 justify-center">
+                <button onclick="confirmLogout()" class="px-6 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 rounded-xl text-white font-bold transition shadow-lg">ใช่, ออกจากระบบ</button>
+                <button onclick="closeLogoutModal()" class="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl text-white font-bold transition border border-white/10">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="relative w-full min-h-screen flex items-center justify-center p-4">
+            <!-- Modal Container -->
+            <div class="w-full max-w-4xl glass-panel p-8 md:p-14 rounded-3xl shadow-[0_0_60px_rgba(176,38,255,0.5)] border border-purple-500/40 transition-all duration-300 scale-95 opacity-0 text-gray-800 dark:text-white" id="modal-box">
+                
+                <button onclick="closeModal()" class="absolute top-6 right-6 text-gray-400 hover:text-red-500 transition hover:rotate-90">
+                    <i class="fas fa-times text-3xl"></i>
+                </button>
+
+                <h2 id="modal-title" class="text-4xl md:text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-neonBlue to-purple-500">
+                    สมัครสมาชิก OTU
+                </h2>
+
+                <form id="register-form" onsubmit="handleRegister(event)" novalidate class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label id="lbl-fname" class="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-2 block mb-2">ชื่อ</label>
+                            <input type="text" id="fname" class="w-full bg-gray-100 dark:bg-black/40 border border-gray-300 dark:border-purple-500/30 rounded-xl px-6 py-4 focus:outline-none focus:border-neonPurple text-xl transition-colors dark:text-white text-black" placeholder="สมชาย">
+                            <p id="err-fname" class="hidden text-red-500 text-sm mt-1 ml-2 font-medium"><i class="fas fa-exclamation-circle mr-1"></i> กรุณากรอกชื่อ</p>
+                        </div>
+                        <div>
+                            <label id="lbl-lname" class="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-2 block mb-2">นามสกุล</label>
+                            <input type="text" id="lname" class="w-full bg-gray-100 dark:bg-black/40 border border-gray-300 dark:border-purple-500/30 rounded-xl px-6 py-4 focus:outline-none focus:border-neonPurple text-xl transition-colors dark:text-white text-black" placeholder="เรียนดี">
+                             <p id="err-lname" class="hidden text-red-500 text-sm mt-1 ml-2 font-medium"><i class="fas fa-exclamation-circle mr-1"></i> กรุณากรอกนามสกุล</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label id="lbl-grade" class="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-2 block mb-2">ระดับชั้น</label>
+                        <select id="grade" class="w-full bg-gray-100 dark:bg-black/40 border border-gray-300 dark:border-purple-500/30 rounded-xl px-6 py-4 focus:outline-none focus:border-neonPurple text-xl appearance-none cursor-pointer dark:text-white text-black">
+                            <option value="m1">มัธยมศึกษาปีที่ 1</option> 
+                            <option value="m2">มัธยมศึกษาปีที่ 2</option> 
+                            <option value="m3">มัธยมศึกษาปีที่ 3</option>
+                            <option value="m4">มัธยมศึกษาปีที่ 4</option> 
+                            <option value="m5">มัธยมศึกษาปีที่ 5</option> 
+                            <option value="m6">มัธยมศึกษาปีที่ 6</option>
+                        </select>
+                    </div>
+
+                    <div class="relative">
+                        <label id="lbl-school" class="text-lg font-semibold text-gray-500 dark:text-gray-400 ml-2 block mb-2">สถานศึกษา</label>
+                        <input type="text" id="school" oninput="checkSchool()" class="w-full bg-gray-100 dark:bg-black/40 border border-gray-300 dark:border-purple-500/30 rounded-xl px-6 py-4 focus:outline-none focus:border-neonPurple text-xl transition-colors dark:text-white text-black" placeholder="เช่น โรงเรียนเตรียมอุดมศึกษา">
+                        <p id="err-school" class="hidden text-red-500 text-sm mt-1 ml-2 font-medium"><i class="fas fa-exclamation-circle mr-1"></i> กรุณากรอกชื่อสถานศึกษา</p>
+                        
+                        <!-- Special School Suggestion -->
+                        <div id="school-suggestion" class="hidden absolute top-full left-0 w-full mt-2 bg-white dark:bg-black border border-neonPurple rounded-xl p-3 shadow-xl z-20 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900 transition flex items-center gap-3" onclick="selectSchool()">
+                            <div class="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-700 flex items-center justify-center overflow-hidden bg-black shrink-0">
+                                <img src="TR.png" alt="TR Logo" class="w-full h-full object-contain">
+                            </div>
+                            <span class="text-base font-semibold dark:text-white text-black">โรงเรียนเทวรักษ์ (Thewarak School)</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="w-full mt-10 py-5 rounded-xl bg-gradient-to-r from-neonBlue to-purple-600 text-white font-bold text-2xl shadow-xl hover:from-purple-600 hover:to-neonBlue transition-all duration-500 transform hover:-translate-y-1">
+                        <span id="btn-submit-text">ลงชื่อเข้าใช้</span>
+                    </button>
+                </form>
+
+                <!-- Success & Loading States -->
+                <div id="success-state" class="hidden flex-col items-center justify-center py-8">
+                    <!-- Neon Green Checkmark -->
+                    <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                    <h3 id="msg-success" class="text-3xl font-bold mt-4 text-neonGreen drop-shadow-[0_0_10px_rgba(57,255,20,0.5)]">ลงชื่อสำเร็จ!</h3>
+                    <p id="msg-redirect" class="text-lg text-gray-400 mt-2">กำลังเข้าสู่ระบบ...</p>
+                </div>
+                
+                <div id="loading-state" class="hidden flex-col items-center justify-center py-10">
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-neonPurple"></div>
+                    <p id="msg-checking" class="mt-6 text-lg text-gray-300">กำลังตรวจสอบข้อมูล...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Translations ---
+        const translations = {
+            th: {
+                navLogin: "ลงชื่อเข้าใช้",
+                heroWelcome: "ยินดีต้อนรับสู่",
+                heroDesc: "ถ้าคุณอยากเป็นคนที่ฉลาดสอบติดทุกโรงเรียนโปรดสมัครเลย",
+                heroBtn: "ลงชื่อสมัคร",
+                heroBtnStart: "เริ่มทำข้อสอบ", 
+                modalTitle: "สมัครสมาชิก OTU",
+                lblFname: "ชื่อ",
+                lblLname: "นามสกุล",
+                lblGrade: "ระดับชั้น",
+                lblSchool: "สถานศึกษา",
+                submitBtn: "ลงชื่อเข้าใช้",
+                success: "ลงชื่อสำเร็จ!",
+                redirect: "กำลังเข้าสู่ระบบ...",
+                checking: "กำลังตรวจสอบข้อมูล...",
+                musicClick: "คลิกเพื่อเล่นเพลง"
+            },
+            en: {
+                navLogin: "Login / Sign Up",
+                heroWelcome: "Welcome to",
+                heroDesc: "If you want to be smart and pass every entrance exam, apply now.",
+                heroBtn: "Register Now",
+                heroBtnStart: "Start Testing", 
+                modalTitle: "OTU Registration",
+                lblFname: "First Name",
+                lblLname: "Last Name",
+                lblGrade: "Grade Level",
+                lblSchool: "School",
+                submitBtn: "Sign In",
+                success: "Success!",
+                redirect: "Logging in...",
+                checking: "Verifying data...",
+                musicClick: "Click disc to play"
+            }
+        };
+        let currentLang = 'th';
+
+        // --- Logic ---
+        let player;
+        let isPlaying = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const preloader = document.getElementById('preloader');
+                const mainContent = document.getElementById('main-content');
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+                mainContent.style.filter = 'blur(0px)';
+                
+                checkAuth();
+                checkCookies(); 
+                createParticles();
+                loadYouTubeAPI();
+            }, 2000); 
+
+            const savedTheme = localStorage.getItem('otu_theme') || 'dark';
+            applyTheme(savedTheme);
+
+            const savedLang = localStorage.getItem('otu_lang') || 'th';
+            applyLang(savedLang);
+        });
+
+        // --- Cookie Logic ---
+        function checkCookies() {
+            if (!localStorage.getItem('otu_cookies_accepted')) {
+                const banner = document.getElementById('cookie-banner');
+                setTimeout(() => {
+                    banner.classList.remove('translate-y-full');
+                }, 3000);
+            }
+        }
+        function acceptCookies() {
+            localStorage.setItem('otu_cookies_accepted', 'true');
+            document.getElementById('cookie-banner').classList.add('translate-y-full');
+        }
+        function resetCookies() {
+            localStorage.removeItem('otu_cookies_accepted');
+            location.reload();
+        }
+
+        // --- Language System ---
+        function toggleLang() {
+            currentLang = currentLang === 'th' ? 'en' : 'th';
+            localStorage.setItem('otu_lang', currentLang);
+            applyLang(currentLang);
+        }
+        function applyLang(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            const langBtn = document.getElementById('current-lang');
+            
+            document.getElementById('nav-login-text').innerText = t.navLogin;
+            document.getElementById('hero-welcome').innerText = t.heroWelcome;
+            document.getElementById('hero-desc').innerText = t.heroDesc;
+            
+            // Dynamic Button Text Check
+            const userStr = localStorage.getItem('otu_user');
+            if (userStr) {
+                document.getElementById('hero-btn-text').innerText = t.heroBtnStart;
+            } else {
+                document.getElementById('hero-btn-text').innerText = t.heroBtn;
+            }
+
+            document.getElementById('modal-title').innerText = t.modalTitle;
+            document.getElementById('lbl-fname').innerText = t.lblFname;
+            document.getElementById('lbl-lname').innerText = t.lblLname;
+            document.getElementById('lbl-grade').innerText = t.lblGrade;
+            document.getElementById('lbl-school').innerText = t.lblSchool;
+            document.getElementById('btn-submit-text').innerText = t.submitBtn;
+            document.getElementById('msg-success').innerText = t.success;
+            document.getElementById('msg-redirect').innerText = t.redirect;
+            document.getElementById('msg-checking').innerText = t.checking;
+            langBtn.innerText = lang.toUpperCase();
+        }
+
+        // --- Theme System ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            const newTheme = isDark ? 'light' : 'dark';
+            applyTheme(newTheme);
+            localStorage.setItem('otu_theme', newTheme);
+        }
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                icon.className = 'fas fa-moon text-yellow-400';
+            } else {
+                html.classList.remove('dark');
+                icon.className = 'fas fa-sun text-orange-500';
+            }
+        }
+
+        // --- YouTube Music (Kouenjoushi Loop) ---
+        function loadYouTubeAPI() {
+            if(!window.YT) {
+                const tag = document.createElement('script');
+                tag.src = "https://www.youtube.com/iframe_api";
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            }
+        }
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: '9SLgQEznnSk', // Kouenjoushi
+                playerVars: {
+                    'autoplay': 1,
+                    'loop': 1,
+                    'playlist': '9SLgQEznnSk', // Required for loop to work
+                    'controls': 0,
+                    'playsinline': 1
+                },
+                events: {
+                    'onReady': (e) => { 
+                        e.target.setVolume(20); 
+                        e.target.playVideo(); 
+                    },
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+        function onPlayerStateChange(event) {
+            const disc = document.querySelector('.disc-img');
+            const icon = document.getElementById('play-icon');
+            const info = document.getElementById('music-info');
+
+            // YT.PlayerState.PLAYING is 1
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                disc.style.animationPlayState = 'running';
+                icon.className = 'fas fa-pause text-white text-3xl drop-shadow-md';
+                info.style.opacity = '1';
+                setTimeout(() => { info.style.opacity = '0'; }, 4000);
+            } else {
+                // If buffering or paused, stop spin
+                isPlaying = false;
+                disc.style.animationPlayState = 'paused';
+                icon.className = 'fas fa-play text-white text-3xl drop-shadow-md';
+            }
+        }
+        function togglePlay() {
+            if(!player) return;
+            if(isPlaying) { player.pauseVideo(); } else { player.playVideo(); }
+        }
+
+        // --- Other Systems ---
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 25;
+            for(let i=0; i<particleCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'absolute rounded-full bg-white/20';
+                const size = Math.random() * 6 + 2;
+                dot.style.width = `${size}px`; dot.style.height = `${size}px`;
+                dot.style.left = `${Math.random() * 100}%`; dot.style.top = `${Math.random() * 100}%`;
+                dot.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 0 },
+                    { opacity: 0.6, offset: 0.5 },
+                    { transform: `translateY(-${window.innerHeight}px) rotate(360deg)`, opacity: 0 }
+                ], { duration: Math.random() * 10000 + 10000, iterations: Infinity, delay: Math.random() * 5000 });
+                container.appendChild(dot);
+            }
+        }
+
+        const heroSection = document.querySelector('main');
+        const ayanokoji = document.getElementById('ayanokoji-img');
+        heroSection.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX * 2) / 60;
+            const y = (window.innerHeight - e.pageY * 2) / 60;
+            ayanokoji.style.transform = `translate(${x}px, ${y}px)`;
+            const shadowX = (e.pageX - window.innerWidth/2) / 25;
+            const shadowY = (e.pageY - window.innerHeight/2) / 25;
+            ayanokoji.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 12px rgba(38, 198, 255, 0.5)) drop-shadow(${shadowX}px ${shadowY}px 8px rgba(176, 38, 255, 0.3))`;
+        });
+
+        const modal = document.getElementById('auth-modal');
+        const modalBox = document.getElementById('modal-box');
+        const schoolInput = document.getElementById('school');
+        const suggestionBox = document.getElementById('school-suggestion');
+        let selectedSpecialSchool = false;
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            // reset form styles
+            document.querySelectorAll('input').forEach(el => {
+                el.classList.remove('border-red-500', 'shake');
+                el.classList.add('border-gray-300', 'dark:border-purple-500/30');
+            });
+            document.querySelectorAll('p[id^="err-"]').forEach(el => el.classList.add('hidden'));
+
+            setTimeout(() => { modalBox.classList.remove('scale-95', 'opacity-0'); modalBox.classList.add('scale-100', 'opacity-100'); }, 10);
+        }
+        function closeModal() {
+            modalBox.classList.remove('scale-100', 'opacity-100'); modalBox.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+        function toggleMenu() {
+            const menu = document.getElementById('settings-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                setTimeout(() => { menu.classList.remove('scale-95', 'opacity-0'); menu.classList.add('scale-100', 'opacity-100'); }, 10);
+            } else {
+                menu.classList.remove('scale-100', 'opacity-100'); menu.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => { menu.classList.add('hidden'); }, 200);
+            }
+        }
+
+        function checkSchool() {
+            const val = schoolInput.value.trim();
+            if (val.includes('เทว') || val.includes('เทวรักษ์')) {
+                suggestionBox.classList.remove('hidden');
+            } else {
+                suggestionBox.classList.add('hidden'); selectedSpecialSchool = false;
+            }
+            // Clear error if typing
+            if(val) {
+                 schoolInput.classList.remove('border-red-500', 'shake');
+                 document.getElementById('err-school').classList.add('hidden');
+            }
+        }
+        function selectSchool() {
+            schoolInput.value = "โรงเรียนเทวรักษ์";
+            selectedSpecialSchool = true;
+            suggestionBox.classList.add('hidden');
+            schoolInput.classList.remove('border-red-500', 'shake');
+            document.getElementById('err-school').classList.add('hidden');
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+
+            // Custom Validation
+            const fnameEl = document.getElementById('fname');
+            const lnameEl = document.getElementById('lname');
+            const schoolEl = document.getElementById('school');
+            
+            let isValid = true;
+            const fields = [
+                { el: fnameEl, err: document.getElementById('err-fname') },
+                { el: lnameEl, err: document.getElementById('err-lname') },
+                { el: schoolEl, err: document.getElementById('err-school') }
+            ];
+
+            fields.forEach(field => {
+                const val = field.el.value.trim();
+                if (!val) {
+                    isValid = false;
+                    // Add error style
+                    field.el.classList.add('border-red-500', 'shake');
+                    field.el.classList.remove('border-gray-300', 'dark:border-purple-500/30');
+                    field.err.classList.remove('hidden');
+                    
+                    // Remove shake after animation
+                    setTimeout(() => {
+                        field.el.classList.remove('shake');
+                    }, 500);
+
+                    // Add listener to clear error on input
+                    field.el.addEventListener('input', function() {
+                        if(this.value.trim()) {
+                            this.classList.remove('border-red-500');
+                            this.classList.add('border-gray-300', 'dark:border-purple-500/30');
+                            field.err.classList.add('hidden');
+                        }
+                    }, { once: true });
+                }
+            });
+
+            if (!isValid) return;
+
+            const form = document.getElementById('register-form');
+            const loading = document.getElementById('loading-state');
+            const success = document.getElementById('success-state');
+            const fname = fnameEl.value;
+            const school = schoolEl.value;
+
+            form.classList.add('hidden');
+            loading.classList.remove('hidden');
+            loading.style.display = 'flex';
+
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                loading.style.display = 'none';
+                success.classList.remove('hidden');
+                success.style.display = 'flex';
+
+                let logoPath = 'default_school.png'; 
+                if (selectedSpecialSchool || school.includes('เทวรักษ์')) {
+                    logoPath = 'TR.png'; 
+                }
+                const userData = { name: fname, school: school, logo: logoPath };
+                localStorage.setItem('otu_user', JSON.stringify(userData));
+                setTimeout(() => { location.reload(); }, 1500);
+            }, 2000);
+        }
+
+        function startTest() {
+            alert('เริ่มทำข้อสอบ... (ระบบทดสอบ)');
+        }
+
+        function checkAuth() {
+            const userStr = localStorage.getItem('otu_user');
+            const t = translations[currentLang];
+            
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                document.getElementById('btn-login').classList.add('hidden');
+                document.getElementById('user-profile').classList.remove('hidden');
+                document.getElementById('user-profile').classList.add('flex');
+                document.getElementById('user-name-display').innerText = user.name;
+                document.getElementById('user-school-logo').src = user.logo;
+                
+                const heroBtnText = document.getElementById('hero-btn-text');
+                const heroBtn = document.getElementById('hero-action-btn');
+                if(heroBtnText && heroBtn) {
+                    heroBtnText.innerText = t.heroBtnStart;
+                    heroBtn.setAttribute('onclick', 'startTest()');
+                }
+            } else {
+                const heroBtnText = document.getElementById('hero-btn-text');
+                const heroBtn = document.getElementById('hero-action-btn');
+                if(heroBtnText && heroBtn) {
+                    heroBtnText.innerText = t.heroBtn;
+                    heroBtn.setAttribute('onclick', 'openModal()');
+                }
+            }
+        }
+        
+        // --- Logout Modal Logic ---
+        function openLogoutModal() {
+            document.getElementById('logout-modal').classList.remove('hidden');
+        }
+        
+        function closeLogoutModal() {
+            document.getElementById('logout-modal').classList.add('hidden');
+        }
+
+        function confirmLogout() {
+            localStorage.removeItem('otu_user');
+            location.reload();
+        }
+
+        // Removed old logout() function and replaced with modal logic above
+        // Kept for reference but not used in UI
+        function logout() {
+            openLogoutModal();
+        }
+    </script>
+</body>
+</html>
