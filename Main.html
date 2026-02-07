@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTU - Dashboard</title>
-    <link rel="icon" href="favicon.png" type="image/png">
+    <title>OTU - Main Dashboard</title>
+    <link rel="icon" href="favicon.png?v=2" type="image/png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;600;800&family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;600;800&family=Kanit:wght@300;400;600&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind Config -->
     <script>
@@ -24,6 +24,8 @@
                     fontFamily: {
                         kanit: ['Kanit', 'sans-serif'],
                         abhaya: ['"Abhaya Libre"', 'serif'],
+                        sarabun: ['"TH Sarabun New"', 'Sarabun', 'sans-serif'],
+                        roman: ['"Times New Roman"', 'serif'],
                     },
                     colors: {
                         neonPurple: '#b026ff',
@@ -31,17 +33,19 @@
                         neonGreen: '#39ff14',
                         deepBg: '#0f0c29',
                         lightBg: '#f0f4f8',
-                        navDark: '#1f2024',
+                        navDark: '#1f2024', /* สีเทาเดิมตามที่ขอ */
                         navLight: '#ffffff',
+                        examSide: '#2d2d2d',
                     },
                     animation: {
                         'spin-disk': 'spin 4s linear infinite',
-                        'bounce-slight': 'bounceSlight 2s infinite',
+                        'bounce-click': 'bounceClick 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                     },
                     keyframes: {
-                        bounceSlight: {
-                            '0%, 100%': { transform: 'translateY(-2%)' },
-                            '50%': { transform: 'translateY(0)' }
+                        bounceClick: {
+                            '0%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(0.95)' },
+                            '100%': { transform: 'scale(1)' }
                         }
                     }
                 }
@@ -50,78 +54,65 @@
     </script>
 
     <style>
-        /* Custom Styles */
-        body {
-            font-family: 'Kanit', sans-serif;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+        /* Import Local Fonts */
+        @font-face { font-family: 'TH Sarabun New'; src: url('THSarabun.ttf') format('truetype'); font-weight: normal; font-style: normal; }
+        @font-face { font-family: 'TH Sarabun New'; src: url('THSarabun Bold.ttf') format('truetype'); font-weight: bold; font-style: normal; }
 
-        /* Backgrounds */
+        body { font-family: 'Kanit', sans-serif; overflow-x: hidden; }
+        
         .dark .bg-animated {
             background: linear-gradient(-45deg, #301046, #090979, #2b0336, #00d4ff);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
         }
         .bg-animated { background: #f0f4f8; }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Glass Panels */
-        .glass-panel {
-            background: rgba(15, 12, 41, 0.9);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(139, 92, 246, 0.4);
+        /* Navbar & Glass Helper */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        html:not(.dark) .glass-panel {
-             background: rgba(255, 255, 255, 0.95);
-             border: 1px solid rgba(0, 0, 0, 0.1);
-             color: #000;
+        html:not(.dark) .glass {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1a202c;
         }
-
-        /* Navbar */
         .nav-custom { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
         html:not(.dark) .nav-custom { border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
 
-        /* Subject Card Hover */
-        .subject-card {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-        }
-        .subject-card:hover {
-            transform: scale(1.05) translateY(-5px);
-            box-shadow: 0 0 25px rgba(176, 38, 255, 0.5);
-            z-index: 10;
-        }
+        .glass-panel { background: rgba(15, 12, 41, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(139, 92, 246, 0.4); }
+        html:not(.dark) .glass-panel { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(0, 0, 0, 0.1); color: #000; }
 
-        /* Scrollbar for Modal List */
-        .chapter-list::-webkit-scrollbar { width: 6px; }
-        .chapter-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .chapter-list::-webkit-scrollbar-thumb { background: #b026ff; border-radius: 10px; }
+        .subject-card { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
+        .subject-card:hover { transform: scale(1.05) translateY(-5px); box-shadow: 0 0 25px rgba(176, 38, 255, 0.5); z-index: 10; }
 
-        /* Disc Animation */
         .disc-wrapper { transition: transform 0.3s ease; }
         .disc-img { animation: spin-disk 4s linear infinite; animation-play-state: paused; transition: filter 0.3s ease; }
         .disc-wrapper:hover { transform: scale(1.1); }
         .disc-wrapper:hover .disc-img { filter: grayscale(100%); animation-play-state: paused !important; }
 
-        /* Loader */
         #preloader { transition: opacity 0.8s ease-out, visibility 0.8s; }
-        #main-content { filter: blur(10px); transition: filter 1s ease-out; }
-        .loader-ring {
-            width: 80px; height: 80px; border-radius: 50%;
-            border: 4px solid transparent;
-            border-top-color: #b026ff; border-right-color: #26c6ff; border-bottom-color: #ff265c;
-            animation: spin-linear 1s linear infinite; 
-        }
+        .loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 4px solid transparent; border-top-color: #b026ff; border-right-color: #26c6ff; border-bottom-color: #ff265c; animation: spin-linear 1s linear infinite; }
         @keyframes spin-linear { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .header-spacer { height: 140px; }
+        .header-spacer { height: 110px; } 
+
+        /* Exam Styles */
+        .exam-paper { font-family: 'TH Sarabun New', 'Sarabun', sans-serif; line-height: 1.5; }
+        .roman-num { font-family: 'Times New Roman', serif; font-style: italic; }
+        .highlight-active { cursor: text; }
+        .highlighted-text { background-color: #fde047; color: black; }
+        .fraction { display: inline-block; text-align: center; vertical-align: middle; margin: 0 0.2em; font-size: 0.9em; }
+        .numerator { display: block; border-bottom: 1px solid currentColor; padding: 0 2px; line-height: 1; }
+        .denominator { display: block; padding: 0 2px; line-height: 1; }
+        
+        #ayanokoji-img { transition: filter 0.1s ease, transform 0.1s ease; will-change: transform, filter; }
     </style>
 </head>
-<body class="text-gray-900 dark:text-white min-h-screen relative overflow-x-hidden bg-animated">
+<!-- Added onclick to trigger music autoplay fallback -->
+<body class="text-gray-900 dark:text-white min-h-screen relative overflow-x-hidden bg-animated" onclick="attemptPlayMusic()">
 
     <!-- Preloader -->
     <div id="preloader" class="fixed inset-0 z-[100] bg-deepBg flex items-center justify-center backdrop-blur-xl">
@@ -131,194 +122,248 @@
     <!-- Particle Background -->
     <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
 
-    <!-- Main Content -->
-    <div id="main-content" class="relative z-10 w-full min-h-screen flex flex-col justify-between">
+    <!-- GLOBAL HEADER -->
+    <header class="fixed top-0 left-0 w-full z-[150] flex flex-col shadow-2xl">
+        
+        <!-- Navbar (h-16 Small Size) -->
+        <nav class="w-full bg-navLight dark:bg-navDark nav-custom px-6 py-2 flex justify-between items-center transition-colors duration-300 z-50 h-16">
+            <!-- Left: Logo -->
+            <div class="flex items-center">
+                <a href="index.html" class="block">
+                    <img src="web_icon.png" alt="Logo" class="h-14 md:h-16 w-auto object-contain hover:scale-105 transition duration-300 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
+                </a>
+            </div>
 
-        <!-- Header (Nav + Marquee) -->
-        <header class="fixed top-0 left-0 w-full z-50 flex flex-col shadow-2xl">
-            <!-- Navbar -->
-            <nav class="w-full bg-navLight dark:bg-navDark nav-custom px-6 py-2 flex justify-between items-center transition-colors duration-300 z-50 h-20">
-                <!-- Left: Logo -->
-                <div class="flex items-center">
-                    <a href="index.html">
-                        <img src="web_icon.png" alt="Logo" class="h-24 md:h-32 w-auto object-contain hover:scale-105 transition duration-300 drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] mt-2">
-                    </a>
-                </div>
-
-                <!-- Right: Profile & Settings -->
-                <div class="flex items-center space-x-6">
+            <!-- Right: Actions -->
+            <div class="flex items-center space-x-6">
+                
+                <!-- Auth Section -->
+                <div id="auth-section" class="flex items-center">
+                    <!-- Login Button -->
+                    <button onclick="window.location.href='index.html'" id="btn-login" class="hidden px-6 py-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-purple-600 hover:to-blue-600 transition-all duration-300 shadow-lg font-bold text-sm md:text-base flex items-center gap-2 text-white border border-white/20">
+                        <i class="fas fa-sign-in-alt"></i> <span id="nav-login-text">ลงชื่อเข้าใช้</span>
+                    </button>
+                    
                     <!-- User Profile Display -->
-                    <div id="user-profile" class="flex items-center gap-4 glass-panel pl-8 pr-4 py-1.5 rounded-full border border-purple-500/50 min-w-[200px] justify-between cursor-default">
+                    <div id="user-profile" class="hidden items-center gap-4 glass-panel px-4 py-1.5 rounded-full border border-purple-500/50">
                         <div class="flex items-center gap-3">
                             <img id="user-school-logo" src="" class="w-10 h-10 rounded-full border-2 border-white/50 bg-white object-contain">
                             <div class="flex flex-col">
                                 <span id="user-name-display" class="font-kanit text-base font-bold dark:text-white text-black">User</span>
-                                <span class="text-[10px] text-green-500 font-bold uppercase tracking-wider">Online</span>
+                                <span class="text-[10px] text-green-400 font-bold uppercase tracking-wider">Online</span>
                             </div>
                         </div>
-                        <div class="h-6 w-px bg-gray-500/50 mx-2"></div>
-                        <button onclick="openLogoutModal()" class="group flex items-center gap-2 text-red-500 hover:text-red-600 transition-all">
-                            <i class="fas fa-power-off text-lg"></i>
+                        <div class="h-6 w-px bg-white/20 mx-2"></div>
+                        <button onclick="openLogoutModal()" class="group flex items-center gap-2 text-red-400 hover:text-red-500 transition-all">
+                            <div class="w-8 h-8 rounded-full bg-red-500/10 group-hover:bg-red-500/20 flex items-center justify-center">
+                                <i class="fas fa-power-off text-base"></i>
+                            </div>
                         </button>
                     </div>
+                </div>
 
-                    <!-- Settings Menu -->
-                    <div class="relative">
-                        <button onclick="toggleMenu()" class="w-10 h-10 rounded-full border border-gray-400/30 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-white/10 transition text-current">
-                            <i class="fas fa-ellipsis-v text-lg"></i>
-                        </button>
-                        <div id="settings-menu" class="absolute right-0 top-14 w-52 glass-panel rounded-xl p-2 hidden transform origin-top-right transition-all duration-200 scale-95 opacity-0 text-white shadow-2xl">
-                            <div class="flex flex-col gap-2">
-                                <div class="flex justify-between items-center p-3 rounded-lg hover:bg-white/10 cursor-pointer text-gray-800 dark:text-white" onclick="toggleTheme()">
-                                    <span class="text-base font-kanit"><i class="fas fa-adjust mr-2"></i>Theme</span>
-                                    <i id="theme-icon" class="fas fa-moon text-yellow-400"></i>
-                                </div>
+                <!-- Settings Menu -->
+                <div class="relative">
+                    <button onclick="toggleMenu()" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 transition text-current border border-white/10">
+                        <i class="fas fa-ellipsis-v text-lg"></i>
+                    </button>
+                    
+                    <!-- Dropdown -->
+                    <div id="settings-menu" class="absolute right-0 top-12 w-52 glass-panel rounded-xl p-2 hidden transform origin-top-right transition-all duration-200 scale-95 opacity-0 text-white shadow-2xl">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex justify-between items-center p-3 rounded-lg hover:bg-white/10 cursor-pointer text-gray-800 dark:text-white" onclick="toggleTheme()">
+                                <span class="text-base font-kanit"><i class="fas fa-adjust mr-2"></i>Theme</span>
+                                <i id="theme-icon" class="fas fa-moon text-yellow-400"></i>
+                            </div>
+                            <div class="flex justify-between items-center p-3 rounded-lg hover:bg-white/10 cursor-pointer text-gray-800 dark:text-white" onclick="toggleLang()">
+                                <span class="text-base font-kanit"><i class="fas fa-language mr-2"></i>Language</span>
+                                <span id="current-lang" class="text-xs border border-neonBlue px-2 py-1 rounded text-neonBlue">TH</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 rounded-lg hover:bg-white/10 cursor-pointer text-gray-800 dark:text-white" onclick="resetCookies()">
+                                <span class="text-base font-kanit"><i class="fas fa-cookie mr-2"></i>Reset Cookies</span>
+                                <i class="fas fa-redo text-gray-400"></i>
                             </div>
                         </div>
                     </div>
                 </div>
-            </nav>
-
-            <!-- Marquee -->
-            <div class="w-full bg-gradient-to-r from-blue-800 to-blue-600 h-8 flex items-center border-b border-white/20 shadow-lg overflow-hidden">
-                <marquee scrollamount="10" class="text-base font-bold text-white font-abhaya tracking-widest leading-none mt-1">
-                    ONLINE TESTING UNIVERSITY &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; SELECT YOUR SUBJECT &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; PREPARE FOR SUCCESS
-                </marquee>
             </div>
-        </header>
+        </nav>
 
-        <div class="header-spacer"></div>
+        <!-- Marquee -->
+        <div class="w-full bg-gradient-to-r from-blue-700 to-blue-500 py-1 border-b border-white/20 shadow-lg">
+            <marquee scrollamount="10" class="text-base font-bold text-white font-abhaya tracking-widest pt-0.5">
+                ONLINE TESTING UNIVERSITY &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; SELECT YOUR SUBJECT &nbsp;&nbsp;&nbsp; • &nbsp;&nbsp;&nbsp; PREPARE FOR SUCCESS
+            </marquee>
+        </div>
 
-        <!-- Main Content Grid -->
+    </header>
+
+    <div class="header-spacer"></div>
+
+    <!-- === SECTION 1: DASHBOARD === -->
+    <div id="dashboard-view" class="relative z-10 w-full min-h-[calc(100vh-140px)] flex flex-col justify-between transition-opacity duration-500">
         <main class="flex-grow flex flex-col md:flex-row items-center justify-center relative w-full max-w-[1920px] mx-auto mt-6 px-6">
-            
-            <!-- Left: Subject Selection (Grid) -->
             <div class="w-full md:w-1/2 z-20 flex flex-col items-center md:items-start pl-4 md:pl-28 pr-6 space-y-8">
-                
                 <h1 class="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-4 self-center md:self-start">
                     เลือกรายวิชา (Select Subject)
                 </h1>
-
-                <!-- Subject Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                    
-                    <!-- Math Card -->
                     <div onclick="openSubjectModal('math')" class="subject-card cursor-pointer group relative h-64 rounded-2xl overflow-hidden border border-white/10 glass-panel shadow-lg">
                         <img src="Math_ico.jpg" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-110 opacity-60 group-hover:opacity-40">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <h2 class="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] tracking-wide group-hover:text-neonBlue transition">
-                                คณิตศาสตร์
-                            </h2>
+                            <h2 class="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] tracking-wide group-hover:text-neonBlue transition">คณิตศาสตร์</h2>
                         </div>
                     </div>
-
-                    <!-- Science Card -->
                     <div onclick="openSubjectModal('sci')" class="subject-card cursor-pointer group relative h-64 rounded-2xl overflow-hidden border border-white/10 glass-panel shadow-lg">
                         <img src="sci.webp" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-110 opacity-60 group-hover:opacity-40">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <h2 class="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] tracking-wide group-hover:text-neonGreen transition">
-                                วิทยาศาสตร์
-                            </h2>
+                            <h2 class="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] tracking-wide group-hover:text-neonGreen transition">วิทยาศาสตร์</h2>
                         </div>
                     </div>
-
-                    <!-- English Card -->
                     <div onclick="openSubjectModal('eng')" class="subject-card cursor-pointer group relative h-64 rounded-2xl overflow-hidden border border-white/10 glass-panel shadow-lg">
                         <img src="eng.jpeg" class="absolute inset-0 w-full h-full object-cover transition duration-500 group-hover:scale-110 opacity-60 group-hover:opacity-40">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <h2 class="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] tracking-wide group-hover:text-neonPurple transition">
-                                ภาษาอังกฤษ
-                            </h2>
+                            <h2 class="text-2xl md:text-3xl font-bold text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] tracking-wide group-hover:text-neonPurple transition">ภาษาอังกฤษ</h2>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 h-[50vh] md:h-[80vh] relative flex justify-end items-end mt-10 md:mt-0 pointer-events-none">
+                <div class="absolute bottom-0 right-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-purple-600 rounded-full filter blur-[100px] opacity-30 animate-pulse"></div>
+                <img id="ayanokoji-img" src="anime.jpg" alt="Character" class="relative h-full w-auto object-contain object-right-bottom z-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+            </div>
+        </main>
 
+        <!-- Music Player Widget -->
+        <div id="music-container" class="fixed bottom-24 right-8 z-40 flex flex-col items-center group">
+            <div id="music-info" class="mb-3 text-right opacity-0 transition-opacity duration-500 bg-black/70 p-3 rounded-xl backdrop-blur-md border border-white/10">
+                <p id="song-title" class="text-sm font-bold text-neonBlue whitespace-nowrap">Classroom of the Elite OST</p>
+                <p id="song-artist" class="text-xs text-gray-300 whitespace-nowrap">Now Playing</p>
+            </div>
+            <div class="disc-wrapper cursor-pointer w-28 h-28 relative" onclick="togglePlay()">
+                 <div class="absolute top-1/2 left-1/2 w-4 h-4 bg-black rounded-full transform -translate-x-1/2 -translate-y-1/2 z-20 border border-gray-700"></div>
+                 <img src="disc.png" alt="Music Disc" class="disc-img w-full h-full object-cover rounded-full shadow-[0_0_20px_rgba(0,0,0,0.6)] border-4 border-gray-800">
+                 <div id="play-status" class="absolute inset-0 flex items-center justify-center z-30 opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 rounded-full">
+                     <i id="play-icon" class="fas fa-play text-white text-3xl drop-shadow-md"></i>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === SECTION 2: TEST MODE === -->
+    <div id="test-mode-view" class="fixed inset-0 top-[120px] z-[40] bg-gray-900 hidden flex-col overflow-hidden font-sarabun text-black">
+        
+        <!-- 1. Instruction Page -->
+        <div id="test-instruction" class="flex-grow flex items-center justify-center p-8 bg-gray-100 overflow-y-auto">
+            <div class="bg-white p-12 rounded-sm shadow-2xl max-w-5xl w-full border border-gray-300 relative exam-paper">
+                <h1 class="text-5xl font-bold text-center mb-4 text-black">ข้อสอบวัดผลสัมฤทธิ์ทางการเรียน</h1>
+                <h2 class="text-4xl font-bold text-center mb-8 border-b-2 border-black pb-4 text-black">กลุ่มสาระการเรียนรู้<span id="header-subject-name">คณิตศาสตร์</span></h2>
+                
+                <div class="space-y-6 text-3xl text-black leading-relaxed">
+                    <p class="font-bold underline mb-2">คำชี้แจงในการทำแบบทดสอบ</p>
+                    <p>1. แบบทดสอบฉบับนี้เป็นข้อสอบวิชา <span id="instruct-subject" class="font-bold">คณิตศาสตร์</span> <span id="instruct-chapter" class="text-blue-700 font-bold"></span></p>
+                    <p>2. แบบทดสอบมีจำนวนทั้งหมด <span class="font-bold text-roman">30</span> ข้อ</p>
+                    <p>3. ให้นักเรียนพิจารณาคำถามแต่ละข้ออย่างถี่ถ้วน แล้วเลือกคำตอบที่ถูกต้องที่สุดเพียงข้อเดียว</p>
+                    <p>4. หากต้องการแก้ไขคำตอบ ให้คลิกเลือกคำตอบใหม่ หรือกดซ้ำที่คำตอบเดิมเพื่อยกเลิก</p>
+                    <p>5. สามารถใช้เครื่องมือ <span class="bg-yellow-200 px-1 text-base"><i class="fas fa-highlighter"></i> ไฮไลท์</span> เพื่อเน้นข้อความสำคัญในโจทย์ได้</p>
+                    <p class="text-red-600 font-bold mt-4">*หมายเหตุ: ระบบจะไม่อนุญาตให้ส่งคำตอบจนกว่าจะทำครบทุกข้อ</p>
+                </div>
+                
+                <div class="mt-12 flex justify-end">
+                    <button onclick="goToExam()" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white text-2xl font-bold rounded-lg shadow-lg flex items-center gap-2 transition-transform transform hover:translate-x-1 font-kanit">
+                        รับทราบและเริ่มทำข้อสอบ <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Exam Interface -->
+        <div id="exam-interface" class="flex-grow hidden flex-row h-full">
+            <!-- Left Sidebar -->
+            <div class="w-72 bg-examSide border-r border-gray-700 flex flex-col font-kanit">
+                <div class="p-4 border-b border-gray-600 bg-gray-800">
+                    <h3 class="text-white font-bold text-lg mb-2">สถานะการทำข้อสอบ</h3>
+                    <div class="flex justify-between text-sm mb-1">
+                        <div class="flex items-center gap-2 text-gray-300"><i class="fas fa-eye text-yellow-400"></i> เปิดดูแล้ว</div>
+                        <span class="text-white font-mono"><span id="count-viewed">0</span>/30</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <div class="flex items-center gap-2 text-gray-300"><div class="w-3 h-3 rounded-full bg-green-500"></div> ทำแล้ว</div>
+                        <span class="text-white font-mono"><span id="count-done">0</span>/30</span>
+                    </div>
+                </div>
+                <div class="p-4 overflow-y-auto flex-grow">
+                    <div class="grid grid-cols-4 gap-3" id="question-grid"></div>
+                </div>
+                <div class="p-4 border-t border-gray-600 bg-gray-800">
+                    <button onclick="submitExam()" class="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold">ส่งคำตอบ</button>
                 </div>
             </div>
 
-            <!-- Right: Image (Consistent with Index) -->
-            <div class="w-full md:w-1/2 h-[50vh] md:h-[80vh] relative flex justify-end items-end mt-10 md:mt-0 pointer-events-none">
-                <div class="absolute bottom-0 right-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] bg-purple-600 rounded-full filter blur-[100px] opacity-30 animate-pulse"></div>
-                <img id="ayanokoji-img" 
-                     src="anime.jpg" 
-                     alt="Character" 
-                     class="relative h-full w-auto object-contain object-right-bottom z-10 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+            <!-- Right Content -->
+            <div class="flex-grow bg-gray-200 p-8 overflow-y-auto relative exam-paper" id="exam-content-wrapper">
+                <!-- Tools -->
+                <div class="fixed top-[150px] right-8 z-50 flex gap-2">
+                    <button onclick="toggleHighlightMode()" id="btn-highlight" class="bg-white p-2 rounded shadow hover:bg-gray-100 text-gray-700 border border-gray-300 transition" title="ไฮไลท์ข้อความ"><i class="fas fa-highlighter text-xl"></i></button>
+                    <div class="flex bg-white rounded shadow border border-gray-300 overflow-hidden">
+                        <button onclick="zoom('out')" class="p-2 hover:bg-gray-100 border-r border-gray-300 text-gray-700"><i class="fas fa-minus"></i></button>
+                        <button onclick="zoom('in')" class="p-2 hover:bg-gray-100 text-gray-700"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="max-w-4xl mx-auto bg-white min-h-[600px] shadow-xl p-12 rounded-sm relative text-black" id="q-card">
+                    <div id="question-container" class="mt-4">
+                        <div class="mb-8 pl-10 relative">
+                            <span class="absolute left-0 top-0 text-3xl font-bold text-black font-sarabun"><span id="q-num" class="text-roman">1</span>.</span>
+                            <div id="q-content" class="text-3xl text-black leading-relaxed mb-6 font-sarabun select-text" style="line-height: 1.5;"></div>
+                        </div>
+                        <div class="space-y-4 pl-10" id="choices-container"></div>
+                    </div>
+                </div>
+
+                <!-- Nav Buttons -->
+                <div class="fixed bottom-8 right-8 flex gap-4 font-kanit">
+                    <button onclick="prevQuestion()" id="btn-prev" class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-full shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"><i class="fas fa-chevron-left mr-2"></i> ย้อนกลับ</button>
+                    <button onclick="nextQuestion()" id="btn-next" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-lg transition">ถัดไป <i class="fas fa-chevron-right ml-2"></i></button>
+                </div>
             </div>
-
-        </main>
-    </div>
-
-    <!-- Music Player -->
-    <div class="fixed bottom-8 right-8 z-40 flex flex-col items-center group">
-        <div id="music-info" class="mb-3 text-right opacity-0 transition-opacity duration-500 bg-black/70 p-3 rounded-xl backdrop-blur-md border border-white/10">
-            <p id="song-title" class="text-sm font-bold text-neonBlue whitespace-nowrap">Classroom of the Elite OST</p>
-            <p id="song-artist" class="text-xs text-gray-300 whitespace-nowrap">Now Playing</p>
-        </div>
-        <div class="disc-wrapper cursor-pointer w-28 h-28 relative" onclick="togglePlay()">
-             <div class="absolute top-1/2 left-1/2 w-4 h-4 bg-black rounded-full transform -translate-x-1/2 -translate-y-1/2 z-20 border border-gray-700"></div>
-             <img src="disc.png" alt="Music Disc" class="disc-img w-full h-full object-cover rounded-full shadow-[0_0_20px_rgba(0,0,0,0.6)] border-4 border-gray-800">
-             <div id="play-status" class="absolute inset-0 flex items-center justify-center z-30 opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 rounded-full">
-                 <i id="play-icon" class="fas fa-play text-white text-3xl drop-shadow-md"></i>
-             </div>
         </div>
     </div>
-    
+
     <!-- Hidden YT Player -->
     <div id="youtube-player" class="hidden"></div>
 
-    <!-- Subject Detail Modal (The "UI Box") -->
+    <!-- Subject Detail Modal -->
     <div id="subject-modal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeSubjectModal()"></div>
         <div class="relative w-full h-full flex items-center justify-center p-4">
-            <!-- Modal Container (Split View) -->
             <div class="w-full max-w-5xl h-[80vh] glass-panel rounded-3xl shadow-[0_0_60px_rgba(38,198,255,0.4)] border border-blue-500/30 overflow-hidden flex flex-col md:flex-row transform scale-95 opacity-0 transition-all duration-300" id="subject-modal-box">
-                
-                <!-- Close Button -->
-                <button onclick="closeSubjectModal()" class="absolute top-4 right-4 z-50 text-gray-400 hover:text-red-500 transition hover:rotate-90">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-
-                <!-- Left Side: Chapter List -->
+                <button onclick="closeSubjectModal()" class="absolute top-4 right-4 z-50 text-gray-400 hover:text-red-500 transition hover:rotate-90"><i class="fas fa-times text-2xl"></i></button>
                 <div class="w-full md:w-1/3 bg-black/40 border-r border-white/10 flex flex-col h-full">
                     <div class="p-6 border-b border-white/10 bg-white/5">
                         <h2 id="modal-subject-title" class="text-2xl font-bold text-white">รายวิชา</h2>
                         <p class="text-xs text-gray-400 mt-1">ระดับชั้นมัธยมศึกษาปีที่ 3</p>
                     </div>
-                    <div id="chapter-list-container" class="chapter-list flex-1 overflow-y-auto p-4 space-y-3">
-                        <!-- Chapters injected by JS -->
-                    </div>
+                    <div id="chapter-list-container" class="chapter-list flex-1 overflow-y-auto p-4 space-y-3"></div>
                 </div>
-
-                <!-- Right Side: Details -->
                 <div class="w-full md:w-2/3 p-8 md:p-12 flex flex-col justify-center items-center text-center relative">
                     <div id="chapter-detail-content" class="w-full max-w-lg space-y-6">
-                        <div class="inline-block px-4 py-1 rounded-full bg-blue-500/20 text-neonBlue text-sm font-bold tracking-wider mb-2 border border-blue-500/30">
-                            <span id="detail-chapter-num">เลือกบทเรียน</span>
-                        </div>
-                        <h3 id="detail-chapter-title" class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-                            ยินดีต้อนรับ
-                        </h3>
-                        <p id="detail-chapter-desc" class="text-lg text-gray-400 font-light leading-relaxed">
-                            กรุณาเลือกบทเรียนจากเมนูทางด้านซ้ายเพื่อดูรายละเอียดและเริ่มทำแบบทดสอบ
-                        </p>
-                        
-                        <button onclick="startTest()" id="start-test-btn" class="hidden mt-8 px-10 py-4 rounded-full bg-gradient-to-r from-neonBlue to-purple-600 hover:from-purple-600 hover:to-neonBlue text-white font-bold text-xl shadow-[0_0_20px_rgba(38,198,255,0.4)] transition-all hover:scale-105">
-                            <i class="fas fa-play mr-2"></i> เริ่มทำแบบทดสอบ
-                        </button>
+                        <div class="inline-block px-4 py-1 rounded-full bg-blue-500/20 text-neonBlue text-sm font-bold tracking-wider mb-2 border border-blue-500/30"><span id="detail-chapter-num">เลือกบทเรียน</span></div>
+                        <h3 id="detail-chapter-title" class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">ยินดีต้อนรับ</h3>
+                        <p id="detail-chapter-desc" class="text-lg text-gray-400 font-light leading-relaxed">กรุณาเลือกบทเรียนจากเมนูทางด้านซ้ายเพื่อดูรายละเอียดและเริ่มทำแบบทดสอบ</p>
+                        <button onclick="initTestMode()" id="start-test-btn" class="hidden mt-8 px-10 py-4 rounded-full bg-gradient-to-r from-neonBlue to-purple-600 hover:from-purple-600 hover:to-neonBlue text-white font-bold text-xl shadow-[0_0_20px_rgba(38,198,255,0.4)] transition-all hover:scale-105"><i class="fas fa-play mr-2"></i> เริ่มทำแบบทดสอบ</button>
                     </div>
-                    
-                    <!-- Background Decoration -->
-                    <div class="absolute inset-0 pointer-events-none opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
                 </div>
-
             </div>
         </div>
     </div>
 
     <!-- Logout Modal -->
-    <div id="logout-modal" class="fixed inset-0 z-[70] hidden">
+    <div id="logout-modal" class="fixed inset-0 z-[200] hidden">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeLogoutModal()"></div>
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 glass-panel p-8 rounded-2xl shadow-2xl text-center border border-purple-500/30 w-[90%] max-w-sm">
             <h3 class="text-2xl font-bold mb-6 text-white">ยืนยันการออกจากระบบ?</h3>
@@ -330,233 +375,429 @@
     </div>
 
     <script>
-        // --- Data: M.3 Curriculum ---
+        // --- Global State ---
+        let currentSubject = 'math';
+        let currentChapter = 1;
+        let examQuestions = []; 
+        let currentQIndex = 0;
+        let answers = [];
+        let viewed = [];
+        let isHighlightMode = false;
+        let currentZoom = 1;
+        let globalExamData = null; 
+
+        // --- Fetch System ---
+        async function loadExamData() {
+            try {
+                const response = await fetch('exams.json');
+                if (!response.ok) throw new Error("File not found");
+                globalExamData = await response.json();
+                console.log("Exam data loaded successfully");
+            } catch (e) {
+                console.log("Waiting for exams.json...");
+            }
+        }
+
+        function getQuestionsForChapter(subject, chapter) {
+            if (globalExamData && globalExamData[subject] && globalExamData[subject][chapter]) {
+                return globalExamData[subject][chapter].map((q, i) => ({...q, id: i+1}));
+            }
+            return [];
+        }
+
+        // --- Subject Metadata ---
         const subjectsData = {
             math: {
                 title: "คณิตศาสตร์ (Mathematics)",
                 chapters: [
-                    { id: 1, title: "อสมการเชิงเส้นตัวแปรเดียว", desc: "การแก้อสมการเชิงเส้นตัวแปรเดียว และการเขียนกราฟแสดงคำตอบ" },
-                    { id: 2, title: "การแยกตัวประกอบพหุนาม", desc: "การแยกตัวประกอบของพหุนามดีกรีสูงกว่าสอง" },
-                    { id: 3, title: "สมการกำลังสองตัวแปรเดียว", desc: "การแก้สมการกำลังสองตัวแปรเดียว โดยวิธีแยกตัวประกอบและสูตร" },
-                    { id: 4, title: "ความคล้าย", desc: "สมบัติของรูปสามเหลี่ยมที่คล้ายกันและการนำไปใช้" },
-                    { id: 5, title: "กราฟของฟังก์ชันกำลังสอง", desc: "ลักษณะของกราฟพาราโบลา จุดยอด แกนสมมาตร" },
-                    { id: 6, title: "สถิติ (3)", desc: "แผนภาพกล่องและการแปลความหมายผลลัพธ์" },
-                    { id: 7, title: "ระบบสมการเชิงเส้นสองตัวแปร", desc: "การแก้ระบบสมการเชิงเส้นสองตัวแปรและโจทย์ปัญหา" },
-                    { id: 8, title: "วงกลม", desc: "ส่วนต่างๆ ของวงกลม มุมที่จุดศูนย์กลางและมุมในส่วนโค้ง" },
-                    { id: 9, title: "พีระมิด กรวย และทรงกลม", desc: "การหาพื้นที่ผิวและปริมาตรของรูปเรขาคณิตสามมิติ" },
-                    { id: 10, title: "ความน่าจะเป็น", desc: "การทดลองสุ่ม เหตุการณ์ และการหาความน่าจะเป็น" },
-                    { id: 11, title: "อัตราส่วนตรีโกณมิติ", desc: "ไซน์ โคไซน์ แทนเจนต์ และการนำไปใช้หาระยะทาง" }
+                    { id: 1, title: "บทที่ 1: อสมการเชิงเส้นตัวแปรเดียว", desc: "การแก้อสมการและกราฟแสดงคำตอบ" },
+                    { id: 2, title: "บทที่ 2: การแยกตัวประกอบของพหุนาม", desc: "ดีกรีสูงกว่าสองและการประยุกต์" },
+                    { id: 3, title: "บทที่ 3: สมการกำลังสองตัวแปรเดียว", desc: "การแก้สมการโดยวิธีต่างๆ" },
+                    { id: 4, title: "บทที่ 4: ความคล้าย", desc: "สมบัติของรูปสามเหลี่ยมที่คล้ายกัน" },
+                    { id: 5, title: "บทที่ 5: กราฟของฟังก์ชันกำลังสอง", desc: "พาราโบลา จุดยอด แกนสมมาตร" },
+                    { id: 6, title: "บทที่ 6: สถิติ (3)", desc: "แผนภาพกล่องและการกระจายข้อมูล" },
+                    { id: 7, title: "บทที่ 7: ระบบสมการเชิงเส้นสองตัวแปร", desc: "การแก้ระบบสมการสองตัวแปร" },
+                    { id: 8, title: "บทที่ 8: วงกลม", desc: "มุมในส่วนโค้งและเส้นสัมผัส" },
+                    { id: 9, title: "บทที่ 9: พีระมิด กรวย และทรงกลม", desc: "พื้นที่ผิวและปริมาตร" },
+                    { id: 10, title: "บทที่ 10: ความน่าจะเป็น", desc: "การทดลองสุ่มและเหตุการณ์" },
+                    { id: 11, title: "บทที่ 11: อัตราส่วนตรีโกณมิติ", desc: "ไซน์ โคไซน์ แทนเจนต์และการนำไปใช้" }
                 ]
             },
             sci: {
                 title: "วิทยาศาสตร์ (Science)",
                 chapters: [
-                    { id: 1, title: "คลื่น", desc: "ส่วนประกอบของคลื่น คลื่นแม่เหล็กไฟฟ้า" },
-                    { id: 2, title: "แสงและการมองเห็น", desc: "การสะท้อน การหักเห เลนส์ และทัศนอุปกรณ์" },
-                    { id: 3, title: "ระบบสุริยะของเรา", desc: "ปฏิสัมพันธ์ในระบบสุริยะ และเทคโนโลยีอวกาศ" },
-                    { id: 4, title: "พันธุศาสตร์", desc: "การถ่ายทอดลักษณะทางพันธุกรรม โครโมโซม DNA" },
-                    { id: 5, title: "คลื่นและแสง", desc: "สมบัติของคลื่นและแสงในชีวิตประจำวัน" },
-                    { id: 6, title: "ระบบนิเวศ", desc: "ความสัมพันธ์ของสิ่งมีชีวิตในระบบนิเวศ โซ่อาหาร สายใยอาหาร" },
-                    { id: 7, title: "ความหลากหลายทางชีวภาพ", desc: "ความหลากหลายของพืชและสัตว์ การอนุรักษ์" },
-                    { id: 8, title: "วัสดุในชีวิตประจำวัน", desc: "พอลิเมอร์ เซรามิก และวัสดุผสม" },
-                    { id: 9, title: "ปฏิกิริยาเคมี", desc: "การเกิดปฏิกิริยาเคมี สมการเคมี และผลกระทบ" },
-                    { id: 10, title: "ไฟฟ้า", desc: "วงจรไฟฟ้าเบื้องต้น กฎของโอห์ม พลังงานไฟฟ้า" },
-                    { id: 11, title: "อิเล็กทรอนิกส์เบื้องต้น", desc: "ชิ้นส่วนอิเล็กทรอนิกส์ ไดโอด ทรานซิสเตอร์" }
+                    { id: 1, title: "บทที่ 1: คลื่นและแสง (Waves & Light)", desc: "สมบัติของคลื่น แสง และการมองเห็น" },
+                    { id: 2, title: "บทที่ 2: ระบบสุริยะของเรา (Solar System)", desc: "ปฏิสัมพันธ์ในระบบสุริยะ เทคโนโลยีอวกาศ" },
+                    { id: 3, title: "บทที่ 3: พันธุศาสตร์ (Genetics)", desc: "การถ่ายทอดลักษณะทางพันธุกรรม โครโมโซม DNA" },
+                    { id: 4, title: "บทที่ 4: ระบบนิเวศ (Ecosystems)", desc: "ความสัมพันธ์ของสิ่งมีชีวิตและสิ่งแวดล้อม" },
+                    { id: 5, title: "บทที่ 5: ไฟฟ้าและอิเล็กทรอนิกส์", desc: "วงจรไฟฟ้า กฎของโอห์ม พลังงานไฟฟ้า" },
+                    { id: 6, title: "บทที่ 6: ปฏิกิริยาเคมี (Chemical Reactions)", desc: "สมการเคมี กรด-เบส และปฏิกิริยาในชีวิตประจำวัน" },
+                    { id: 7, title: "บทที่ 7: วัสดุศาสตร์ (Materials Science)", desc: "พอลิเมอร์ เซรามิก และวัสดุผสม" },
+                    { id: 8, title: "บทที่ 8: ดาราศาสตร์และอวกาศ", desc: "เอกภพ กาแล็กซี และดาวฤกษ์" }
                 ]
             },
             eng: {
                 title: "ภาษาอังกฤษ (English)",
                 chapters: [
-                    { id: 1, title: "Tenses Review", desc: "Present Perfect, Past Continuous, and Future forms" },
-                    { id: 2, title: "Passive Voice", desc: "Understanding Active vs Passive voice in different tenses" },
-                    { id: 3, title: "Conditional Sentences", desc: "If-clauses: Type 1, 2, and 3" },
-                    { id: 4, title: "Direct & Indirect Speech", desc: "Reporting statements, questions, and commands" },
-                    { id: 5, title: "Relative Clauses", desc: "Who, Which, That, Whose, Where" },
-                    { id: 6, title: "Modal Verbs", desc: "Can, Could, Should, Must, Have to, Might" },
-                    { id: 7, title: "Question Tags", desc: "Forming question tags correctly" },
-                    { id: 8, title: "Gerunds & Infinitives", desc: "Verbs followed by -ing or to + verb" },
-                    { id: 9, title: "Reading Comprehension", desc: "Skills for understanding main ideas and details" },
-                    { id: 10, title: "Vocabulary: Environment", desc: "Words related to nature and global issues" },
-                    { id: 11, title: "Writing Skills", desc: "Paragraph structure and essay writing basics" }
+                    { id: 1, title: "Chapter 1: Lifestyles & Culture", desc: "Vocabulary regarding habits and traditions." },
+                    { id: 2, title: "Chapter 2: Past Events (Past Tenses)", desc: "Narrating past stories using Past Simple/Continuous." },
+                    { id: 3, title: "Chapter 3: Future Plans", desc: "Talking about future intentions and predictions." },
+                    { id: 4, title: "Chapter 4: Health & Advice (Modals)", desc: "Using should, must, have to for advice/obligation." },
+                    { id: 5, title: "Chapter 5: Passive Voice", desc: "Describing processes and inventions." },
+                    { id: 6, title: "Chapter 6: Conditional Sentences", desc: "If-clauses Type 1 and 2." },
+                    { id: 7, title: "Chapter 7: Reported Speech", desc: "Reporting what others said." },
+                    { id: 8, title: "Chapter 8: Relative Clauses", desc: "Using who, which, that, where." },
+                    { id: 9, title: "Chapter 9: Environment", desc: "Saving the planet vocab and reading." },
+                    { id: 10, title: "Chapter 10: Reading Comprehension", desc: "Practice skills for reading texts." }
                 ]
             }
         };
 
-        // --- Auth Check ---
+        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Check if user is logged in
+            loadExamData(); 
             const userStr = localStorage.getItem('otu_user');
-            if (!userStr) {
-                // Not logged in -> Redirect to index
-                window.location.href = 'index.html';
-                return;
+            if (userStr) { 
+                const user = JSON.parse(userStr);
+                document.getElementById('user-name-display').innerText = user.name;
+                document.getElementById('user-school-logo').src = user.logo || 'default_school.png';
+                document.getElementById('user-profile').classList.remove('hidden');
+                document.getElementById('user-profile').classList.add('flex');
+                document.getElementById('btn-login').classList.add('hidden');
+            } else {
+                document.getElementById('btn-login').classList.remove('hidden');
+                document.getElementById('user-profile').classList.add('hidden');
             }
-
-            // Load User Profile
-            const user = JSON.parse(userStr);
-            document.getElementById('user-name-display').innerText = user.name;
-            document.getElementById('user-school-logo').src = user.logo || 'default_school.png';
-
-            // Init UI
-            setTimeout(() => {
-                document.getElementById('preloader').style.opacity = '0';
-                document.getElementById('preloader').style.visibility = 'hidden';
-                document.getElementById('main-content').style.filter = 'blur(0px)';
-                createParticles();
-                loadYouTubeAPI();
-            }, 1500);
-
-            // Load Theme
-            const savedTheme = localStorage.getItem('otu_theme') || 'dark';
-            if (savedTheme === 'dark') document.documentElement.classList.add('dark');
-            else document.documentElement.classList.remove('dark');
+            setTimeout(() => { 
+                document.getElementById('preloader').style.opacity = '0'; 
+                document.getElementById('preloader').style.visibility = 'hidden'; 
+                document.getElementById('main-content').style.filter = 'blur(0px)'; 
+                loadYouTubeAPI(); 
+            }, 1000);
+            
+            // Mouse animation
+            const ayanokoji = document.getElementById('ayanokoji-img');
+            const main = document.querySelector('main');
+            if(ayanokoji && main) {
+                main.addEventListener('mousemove', (e) => {
+                    const x = (window.innerWidth - e.pageX * 2) / 60;
+                    const y = (window.innerHeight - e.pageY * 2) / 60;
+                    ayanokoji.style.transform = `translate(${x}px, ${y}px)`;
+                    const shadowX = (e.pageX - window.innerWidth/2) / 25;
+                    const shadowY = (e.pageY - window.innerHeight/2) / 25;
+                    ayanokoji.style.filter = `drop-shadow(${-shadowX}px ${-shadowY}px 8px rgba(38, 198, 255, 0.6)) drop-shadow(${shadowX}px ${shadowY}px 5px rgba(176, 38, 255, 0.4))`;
+                });
+            }
         });
 
-        // --- Subject Modal Logic ---
-        const modal = document.getElementById('subject-modal');
-        const modalBox = document.getElementById('subject-modal-box');
-        
-        function openSubjectModal(subjectKey) {
-            const data = subjectsData[subjectKey];
-            if(!data) return;
-
-            // Set Title
-            document.getElementById('modal-subject-title').innerText = data.title;
-            
-            // Populate List
-            const listContainer = document.getElementById('chapter-list-container');
-            listContainer.innerHTML = '';
-            
-            data.chapters.forEach(chap => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left px-5 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-neonBlue/50 transition-all group flex items-center justify-between';
-                btn.onclick = () => showChapterDetail(chap);
+        // --- Functions ---
+        function attemptPlayMusic() {
+            if(player && player.playVideo) {
+                if(player.getPlayerState() !== 1) { // 1 = playing
+                    player.playVideo();
+                }
                 
-                btn.innerHTML = `
-                    <div>
-                        <span class="text-xs text-neonBlue font-bold uppercase tracking-wider block mb-1">บทที่ ${chap.id}</span>
-                        <span class="text-sm font-medium text-gray-200 group-hover:text-white transition">${chap.title}</span>
-                    </div>
-                    <i class="fas fa-chevron-right text-gray-500 group-hover:text-neonBlue transition transform group-hover:translate-x-1"></i>
-                `;
-                listContainer.appendChild(btn);
+                // Determine which mode we are in to set correct volume
+                const isExamMode = !document.getElementById('test-mode-view').classList.contains('hidden');
+                if(isExamMode) {
+                    player.setVolume(3); // Keep it low if in exam
+                } else {
+                    player.setVolume(20); // Normal volume otherwise
+                }
+            }
+        }
+
+        function openSubjectModal(key) {
+            currentSubject = key;
+            const data = subjectsData[key];
+            document.getElementById('modal-subject-title').innerText = data.title;
+            const list = document.getElementById('chapter-list-container');
+            list.innerHTML = '';
+            data.chapters.forEach(c => {
+                const b = document.createElement('button');
+                b.className = 'w-full text-left px-5 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-neonBlue/50 transition-all group flex items-center justify-between mb-2';
+                b.innerHTML = `<div><span class="text-xs text-neonBlue font-bold uppercase tracking-wider block mb-1">${c.title}</span></div><i class="fas fa-chevron-right text-gray-500 group-hover:text-neonBlue transition transform group-hover:translate-x-1"></i>`;
+                b.onclick = () => {
+                    currentChapter = c.id;
+                    document.getElementById('detail-chapter-num').innerText = `${c.title}`;
+                    document.getElementById('detail-chapter-title').innerText = data.title;
+                    document.getElementById('detail-chapter-desc').innerText = c.desc;
+                    document.getElementById('start-test-btn').classList.remove('hidden');
+                };
+                list.appendChild(b);
             });
-
-            // Reset Details View
-            document.getElementById('detail-chapter-num').innerText = "เลือกบทเรียน";
-            document.getElementById('detail-chapter-title').innerText = "ยินดีต้อนรับ";
-            document.getElementById('detail-chapter-desc').innerText = "กรุณาเลือกบทเรียนจากเมนูทางด้านซ้ายเพื่อดูรายละเอียดและเริ่มทำแบบทดสอบ";
-            document.getElementById('start-test-btn').classList.add('hidden');
-
-            // Show Modal
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modalBox.classList.remove('scale-95', 'opacity-0');
-                modalBox.classList.add('scale-100', 'opacity-100');
+            document.getElementById('subject-modal').classList.remove('hidden');
+            setTimeout(() => { 
+                document.getElementById('subject-modal-box').classList.remove('scale-95', 'opacity-0'); 
+                document.getElementById('subject-modal-box').classList.add('scale-100', 'opacity-100'); 
             }, 10);
         }
 
-        function showChapterDetail(chapter) {
-            // Animate Text Change
-            const content = document.getElementById('chapter-detail-content');
-            content.classList.add('opacity-0', 'translate-y-2');
+        function initTestMode() {
+            examQuestions = getQuestionsForChapter(currentSubject, currentChapter);
+            if (examQuestions.length === 0) {
+                alert("ขณะนี้ยังไม่มีข้อมูลข้อสอบสำหรับบทเรียนนี้\n(กรุณาเพิ่มไฟล์ exams.json หรือรออัปเดต)");
+                return;
+            }
+            answers = new Array(examQuestions.length).fill(null);
+            viewed = new Array(examQuestions.length).fill(false);
             
-            setTimeout(() => {
-                document.getElementById('detail-chapter-num').innerText = `บทที่ ${chapter.id}`;
-                document.getElementById('detail-chapter-title').innerText = chapter.title;
-                document.getElementById('detail-chapter-desc').innerText = chapter.desc;
-                document.getElementById('start-test-btn').classList.remove('hidden');
-                
-                content.classList.remove('opacity-0', 'translate-y-2');
-            }, 200);
+            closeSubjectModal();
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('music-container').classList.add('hidden');
+            
+            // --- Reduce Music Volume ---
+            if(player) {
+                player.setVolume(3); // Set to 3%
+            }
+            
+            document.getElementById('header-subject-name').innerText = subjectsData[currentSubject].title.split('(')[0];
+            document.getElementById('instruct-subject').innerText = subjectsData[currentSubject].title.split('(')[0];
+            const chapterObj = subjectsData[currentSubject].chapters.find(c => c.id === currentChapter);
+            document.getElementById('instruct-chapter').innerText = `(${chapterObj ? chapterObj.title : ''})`;
+
+            document.getElementById('test-mode-view').classList.remove('hidden');
+            document.getElementById('test-mode-view').classList.add('flex');
         }
 
-        function closeSubjectModal() {
-            modalBox.classList.remove('scale-100', 'opacity-100');
-            modalBox.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        function goToExam() {
+            document.getElementById('test-instruction').classList.add('hidden');
+            document.getElementById('exam-interface').classList.remove('hidden');
+            document.getElementById('exam-interface').classList.add('flex');
+            renderSidebar();
+            loadQuestion(0);
         }
 
-        function startTest() {
-            alert('กำลังเข้าสู่หน้าทำแบบทดสอบ... (จำลอง)');
-            // window.location.href = 'Test.html'; 
-        }
+        function loadQuestion(index) {
+            currentQIndex = index;
+            viewed[index] = true;
+            const qData = examQuestions[index];
+            document.getElementById('q-num').innerText = qData.id;
+            document.getElementById('q-content').innerHTML = qData.q + (qData.svg || "");
+            
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
 
-        // --- Common Logic (Logout, Theme, Music, Particles) ---
-        // Same as Index.html logic
-        function openLogoutModal() { document.getElementById('logout-modal').classList.remove('hidden'); }
-        function closeLogoutModal() { document.getElementById('logout-modal').classList.add('hidden'); }
-        function confirmLogout() {
-            localStorage.removeItem('otu_user');
-            window.location.href = 'index.html';
-        }
-        function toggleTheme() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark'); localStorage.setItem('otu_theme', 'light');
+            if (qData.type === 'mc') {
+                qData.choices.forEach((choice, i) => {
+                    const isChecked = answers[index] === i;
+                    const html = `
+                    <div onclick="selectAnswer(${i})" class="group flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition active:scale-[0.98] animate-bounce-click ${isChecked ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:bg-gray-100'}">
+                        <div class="w-8 h-8 rounded-full border-2 ${isChecked ? 'border-blue-500' : 'border-gray-400'} flex items-center justify-center shrink-0 transition-colors bg-white">
+                            <div class="dot w-4 h-4 rounded-full bg-blue-500 opacity-${isChecked ? '100' : '0'} transition-opacity"></div>
+                        </div>
+                        <span class="text-3xl leading-relaxed text-black pt-1 font-sarabun">${choice}</span>
+                    </div>`;
+                    container.innerHTML += html;
+                });
+            } else if (qData.type === 'text') {
+                const val = answers[index] || '';
+                const html = `
+                <div class="mt-4 flex flex-col items-center">
+                    <label class="block text-gray-700 text-3xl mb-4 font-sarabun">คำตอบ (ตัวเลข/จุดทศนิยม):</label>
+                    <input type="text" class="w-64 p-4 border-2 border-gray-400 rounded-lg text-4xl text-center focus:border-blue-500 outline-none text-black bg-white font-mono tracking-widest placeholder-gray-300 shadow-inner" placeholder="0.00" value="${val}" oninput="inputTextAnswer(this)">
+                </div>`;
+                container.innerHTML = html;
+            }
+
+            document.getElementById('btn-prev').disabled = index === 0;
+            const nextBtn = document.getElementById('btn-next');
+            if (index === examQuestions.length - 1) {
+                nextBtn.innerHTML = 'สิ้นสุด <i class="fas fa-stop ml-2"></i>';
+                nextBtn.onclick = null;
             } else {
-                html.classList.add('dark'); localStorage.setItem('otu_theme', 'dark');
+                nextBtn.innerHTML = 'ถัดไป <i class="fas fa-chevron-right ml-2"></i>';
+                nextBtn.onclick = nextQuestion;
             }
+            renderSidebar();
         }
 
-        // Music
-        let player, isPlaying = false;
-        function loadYouTubeAPI() {
-            if(!window.YT) {
-                const tag = document.createElement('script');
-                tag.src = "https://www.youtube.com/iframe_api";
-                const firstScriptTag = document.getElementsByTagName('script')[0];
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            }
+        function selectAnswer(val) {
+            if (answers[currentQIndex] === val) answers[currentQIndex] = null; 
+            else answers[currentQIndex] = val;
+            renderSidebar();
+            loadQuestion(currentQIndex);
         }
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('youtube-player', {
-                height: '0', width: '0', videoId: '9SLgQEznnSk',
-                playerVars: { 'autoplay': 1, 'loop': 1, 'playlist': '9SLgQEznnSk', 'controls': 0 },
-                events: {
-                    'onReady': (e) => { e.target.setVolume(20); e.target.playVideo(); },
-                    'onStateChange': (e) => {
-                         const disc = document.querySelector('.disc-img');
-                         if(e.data == 1) { 
-                             isPlaying = true; 
-                             disc.style.animationPlayState = 'running'; 
-                             document.getElementById('play-icon').className = 'fas fa-pause text-white text-3xl drop-shadow-md';
-                             const info = document.getElementById('music-info');
-                             info.style.opacity = '1'; setTimeout(() => info.style.opacity = '0', 4000);
-                         } else { 
-                             isPlaying = false; 
-                             disc.style.animationPlayState = 'paused';
-                             document.getElementById('play-icon').className = 'fas fa-play text-white text-3xl drop-shadow-md';
-                         }
+
+        function inputTextAnswer(el) {
+            el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+            answers[currentQIndex] = el.value.trim() === '' ? null : el.value;
+            renderSidebar();
+        }
+
+        function nextQuestion() { if (currentQIndex < examQuestions.length - 1) loadQuestion(currentQIndex + 1); }
+        function prevQuestion() { if (currentQIndex > 0) loadQuestion(currentQIndex - 1); }
+
+        function renderSidebar() {
+            const grid = document.getElementById('question-grid');
+            grid.innerHTML = '';
+            let doneCount = 0, viewedCount = 0;
+
+            examQuestions.forEach((_, i) => {
+                const isDone = answers[i] !== null && answers[i] !== '';
+                const isViewed = viewed[i];
+                if(isDone) doneCount++;
+                if(isViewed && !isDone) viewedCount++;
+
+                const btn = document.createElement('button');
+                let classes = "w-10 h-10 rounded font-mono text-sm font-bold flex items-center justify-center relative transition ";
+                
+                if (currentQIndex === i) {
+                    classes += "border-2 border-yellow-400 text-white ";
+                    if (isDone) classes += "bg-green-600";
+                    else if (isViewed) classes += "bg-gray-700";
+                    else classes += "bg-gray-700";
+                } else {
+                    if (isDone) {
+                        classes += "bg-green-600 text-white hover:bg-green-500"; 
+                        btn.innerHTML = `<div class="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center"><div class="w-3 h-3 bg-white rounded-full"></div></div>`; 
+                    } else if (isViewed) {
+                        classes += "bg-gray-700 text-gray-300 hover:bg-gray-600"; 
+                        btn.innerHTML = `<i class="fas fa-eye text-yellow-400"></i>`;
+                    } else {
+                        classes += "bg-gray-800 text-gray-500 hover:bg-gray-700 border border-gray-600"; 
+                        btn.innerHTML = `<div class="w-6 h-6 rounded-full border-2 border-gray-500"></div>`; 
                     }
                 }
+                btn.className = classes;
+                btn.onclick = () => loadQuestion(i);
+                grid.appendChild(btn);
             });
-        }
-        function togglePlay() { if(player) isPlaying ? player.pauseVideo() : player.playVideo(); }
 
-        // Particles
-        function createParticles() {
-            const container = document.getElementById('particles');
-            for(let i=0; i<25; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'absolute rounded-full bg-white/20';
-                const size = Math.random() * 6 + 2;
-                dot.style.width = `${size}px`; dot.style.height = `${size}px`;
-                dot.style.left = `${Math.random() * 100}%`; dot.style.top = `${Math.random() * 100}%`;
-                dot.animate([
-                    { transform: 'translateY(0) rotate(0deg)', opacity: 0 },
-                    { opacity: 0.6, offset: 0.5 },
-                    { transform: `translateY(-${window.innerHeight}px) rotate(360deg)`, opacity: 0 }
-                ], { duration: Math.random() * 10000 + 10000, iterations: Infinity, delay: Math.random() * 5000 });
-                container.appendChild(dot);
+            document.getElementById('count-done').innerText = doneCount;
+            document.getElementById('count-viewed').innerText = viewedCount;
+        }
+
+        function zoom(dir) {
+            if (dir === 'in') currentZoom += 0.2; else if (currentZoom > 0.8) currentZoom -= 0.2;
+            document.getElementById('q-card').style.transform = `scale(${currentZoom})`;
+            document.getElementById('q-card').style.transformOrigin = 'top center';
+        }
+        function toggleHighlightMode() {
+            isHighlightMode = !isHighlightMode;
+            const btn = document.getElementById('btn-highlight');
+            if (isHighlightMode) {
+                btn.classList.add('bg-yellow-200', 'border-yellow-400');
+                document.body.style.cursor = 'text';
+            } else {
+                btn.classList.remove('bg-yellow-200', 'border-yellow-400');
+                document.body.style.cursor = 'default';
+                const content = document.getElementById('q-content');
+                content.innerHTML = content.innerHTML.replace(/<span class="highlighted-text">(.*?)<\/span>/g, '$1');
             }
         }
-        const ayanokoji = document.getElementById('ayanokoji-img');
-        document.querySelector('main').addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth - e.pageX * 2) / 60;
-            const y = (window.innerHeight - e.pageY * 2) / 60;
-            ayanokoji.style.transform = `translate(${x}px, ${y}px)`;
+        document.getElementById('exam-content-wrapper').addEventListener('mouseup', function() {
+            if (!isHighlightMode) return;
+            const selection = window.getSelection();
+            if (!selection.rangeCount || selection.isCollapsed) return;
+            const range = selection.getRangeAt(0);
+            const container = document.getElementById('q-card');
+            if (!container.contains(range.commonAncestorContainer)) return;
+            const span = document.createElement("span");
+            span.className = "highlighted-text";
+            try { range.surroundContents(span); selection.removeAllRanges(); } catch (e) {}
         });
+
+        function submitExam() {
+            const unanswered = [];
+            answers.forEach((ans, i) => { if (ans === null || ans === '') unanswered.push(i + 1); });
+            if (unanswered.length > 0) { alert(`กรุณาทำข้อสอบให้ครบทุกข้อก่อนส่ง\n\nข้อที่ยังไม่ได้ทำ: ${unanswered.join(', ')}`); return; }
+            if(confirm("ยืนยันการส่งคำตอบ?")) { alert("ส่งคำตอบเรียบร้อย! (จบการจำลอง)"); location.reload(); }
+        }
+
+        function closeSubjectModal() { document.getElementById('subject-modal-box').classList.remove('scale-100', 'opacity-100'); document.getElementById('subject-modal-box').classList.add('scale-95', 'opacity-0'); setTimeout(() => { document.getElementById('subject-modal').classList.add('hidden'); }, 300); }
+        function openLogoutModal() { document.getElementById('logout-modal').classList.remove('hidden'); }
+        function closeLogoutModal() { document.getElementById('logout-modal').classList.add('hidden'); }
+        function confirmLogout() { localStorage.removeItem('otu_user'); window.location.href = 'index.html'; }
+        
+        function toggleMenu() {
+            const menu = document.getElementById('settings-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                setTimeout(() => { menu.classList.remove('scale-95', 'opacity-0'); menu.classList.add('scale-100', 'opacity-100'); }, 10);
+            } else {
+                menu.classList.remove('scale-100', 'opacity-100'); menu.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => { menu.classList.add('hidden'); }, 200);
+            }
+        }
+        
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); }
+        function toggleLang() { alert('Language switch (demo)'); }
+        function resetCookies() { alert('Cookies Reset'); }
+        
+       let player, isPlaying = false;
+let hasInteracted = false; // ตรวจสอบว่าคลิกหรือยัง
+
+function loadYouTubeAPI() {
+    if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const f = document.getElementsByTagName('script')[0];
+        f.parentNode.insertBefore(tag, f);
+    }
+}
+
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('youtube-player', {
+        height: '0',
+        width: '0',
+        videoId: '9SLgQEznnSk',
+        playerVars: {
+            'autoplay': 1,
+            'loop': 1,
+            'playlist': '9SLgQEznnSk',
+            'mute': 1, // บังคับ Mute เพื่อให้ Autoplay ผ่านในบาง Browser
+            'controls': 0
+        },
+        events: {
+            'onReady': (e) => {
+                e.target.setVolume(20);
+                e.target.playVideo();
+            },
+            'onStateChange': onPlayerStateChange
+        }
+    });
+}
+
+// ฟังก์ชันที่จะทำงานเมื่อมีการคลิกที่หน้าจอครั้งแรก
+function attemptPlayMusic() {
+    if (player && !hasInteracted) {
+        player.unMute(); // เลิกปิดเสียง
+        player.playVideo();
+        hasInteracted = true;
+    }
+}
+
+function onPlayerStateChange(e) {
+    const d = document.getElementById('disc-img');
+    const icon = document.getElementById('play-icon');
+    if (!d || !icon) return;
+
+    if (e.data == YT.PlayerState.PLAYING) {
+        isPlaying = true;
+        d.style.animationPlayState = 'running';
+        icon.className = 'fas fa-pause text-white text-xl';
+    } else {
+        isPlaying = false;
+        d.style.animationPlayState = 'paused';
+        icon.className = 'fas fa-play text-white text-xl';
+    }
+}
+
+function togglePlay() {
+    if (player) {
+        if (isPlaying) {
+            player.pauseVideo();
+        } else {
+            player.unMute();
+            player.playVideo();
+        }
+    }
+}
+
+// เรียกโหลด API ทันทีที่รันสคริปต์
+loadYouTubeAPI();
+
     </script>
 </body>
 </html>
