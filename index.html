@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTU - Online Testing University</title>
+    <link rel="icon" href="favicon.png" type="image/png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -30,7 +31,7 @@
                         neonGreen: '#39ff14', /* Neon Green */
                         deepBg: '#0f0c29',
                         lightBg: '#f0f4f8',
-                        navDark: '#1f2024', /* Lighter Solid Grey for Nav (Gray-600) */
+                        navDark: '#1f2024', /* Custom Dark Grey #1f2024 */
                         navLight: '#ffffff',
                     },
                     fontSize: {
@@ -41,6 +42,7 @@
                         'spin-linear': 'spin 1.5s linear infinite',
                         'spin-disk': 'spin 4s linear infinite',
                         'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+                        'success-pop': 'successPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
                     },
                     keyframes: {
                         shake: {
@@ -48,6 +50,11 @@
                             '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
                             '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
                             '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        successPop: {
+                            '0%': { transform: 'scale(0) rotate(-360deg)', opacity: '0' },
+                            '60%': { transform: 'scale(1.2) rotate(20deg)', opacity: '1' },
+                            '100%': { transform: 'scale(1) rotate(0deg)', opacity: '1' }
                         }
                     }
                 }
@@ -83,13 +90,13 @@
 
         /* Navbar Custom Styles */
         .nav-custom {
-            border-bottom: 1px solid rgba(202, 202, 202, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         html:not(.dark) .nav-custom {
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        /* Glassmorphism for panels (Keep for modal/menus, removed from Nav) */
+        /* Glassmorphism for panels */
         .glass-panel {
             background: rgba(15, 12, 41, 0.95);
             backdrop-filter: blur(12px);
@@ -121,7 +128,7 @@
         .disc-wrapper:hover { transform: scale(1.1); }
         .disc-wrapper:hover .disc-img { filter: grayscale(100%); animation-play-state: paused !important; }
 
-        /* Checkmark (Larger & Neon Green & No Donut Hole) */
+        /* Checkmark (Larger, Neon Green, No Donut Hole, Spinning Effect) */
         .checkmark__circle { 
             stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; 
             stroke: #39ff14; /* Neon Green */
@@ -129,23 +136,23 @@
             animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; 
         }
         .checkmark { 
-            width: 80px; /* Larger */
-            height: 80px; 
+            width: 120px; /* Larger Size 120px */
+            height: 120px; 
             border-radius: 50%; display: block; stroke-width: 2; 
             stroke: #39ff14; /* Neon Green */
             stroke-miterlimit: 10; margin: 10% auto; 
-            box-shadow: inset 0px 0px 0px #39ff14; 
-            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both; 
+            box-shadow: inset 0px 0px 0px #39ff14, 0 0 30px rgba(57, 255, 20, 0.6); /* Glow Effect */
+            /* New combined animation */
+            animation: fill .4s ease-in-out .4s forwards, successPop 0.8s ease-out; 
         }
         .checkmark__check { 
             transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; 
             animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; 
-            stroke: #fff; /* Checkmark itself remains white */
+            stroke: #fff; 
         }
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
-        @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
-        /* Adjusted filling to cover the hole (from 30px to 50px+) */
-        @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 50px #39ff14; } }
+        /* Fill animation covers the hole */
+        @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 80px #39ff14, 0 0 50px rgba(57, 255, 20, 0.8); } }
 
         /* Fixed Header Spacing */
         .header-spacer { height: 140px; } 
@@ -167,7 +174,7 @@
         <!-- Fixed Header Group (Nav + Marquee) -->
         <header class="fixed top-0 left-0 w-full z-50 flex flex-col shadow-2xl">
             
-            <!-- Navbar (Solid Lighter Grey in Dark Mode, No Blur) -->
+            <!-- Navbar (Custom Dark Grey #1f2024) -->
             <nav class="w-full bg-navLight dark:bg-navDark nav-custom px-6 py-2 flex justify-between items-center transition-colors duration-300 z-50 h-20">
                 <!-- Left: Logo -->
                 <div class="flex items-center">
@@ -752,7 +759,8 @@
                 }
                 const userData = { name: fname, school: school, logo: logoPath };
                 localStorage.setItem('otu_user', JSON.stringify(userData));
-                setTimeout(() => { location.reload(); }, 1500);
+                // Redirect to Main.html
+                setTimeout(() => { window.location.href = 'Main.html'; }, 1500);
             }, 2000);
         }
 
